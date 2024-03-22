@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simple Game</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    #container {
+        display: flex;
+        justify-content: space-between;
+    }
+    #gameCanvas {
+        border: 2px solid black;
+        background-color: #eee;
+    }
+    #points {
+        font-size: 24px;
+    }
+    #scores {
+        width: 200px;
+        margin-left: 20px;
+        border-collapse: collapse;
+    }
+    #scores td, #scores th {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    #scores th {
+        background-color: #f2f2f2;
+    }
+</style>
+</head>
+<body>
+<div id="container">
+    <div>
+        <div id="points">Points: 0</div>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+    </div>
+    <div>
+        <h2>Scores</h2>
+        <table id="scores">
+            <tr>
+                <th>Attempt</th>
+                <th>Score</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    const TILE_SIZE = 100;
+    const NUM_ROWS = 4;
+    const NUM_COLUMNS = 4;
+    const WHITE_COLOR = "#ffffff";
+    const BLACK_COLOR = "#000000";
+    const BLUE_COLOR = "#0000ff";
+    const YELLOW_COLOR = "#ffff00";
+    const BACKGROUND_COLOR = "#cccccc";
+    const BLACK_PENALTY = 2;
+    const EXIT_PENALTY = 10;
+
+    let qValues = {};
+
+    let grid = [
+        [0, 0, 0, 0],
+        [0, 1, 0, 1],
+        [0, 0, 0, 0],
+        [0, 0, 0, 2]
+    ];
+    let player = { column: 0, row: 0, score: 0 };
+    let scores = [];
+    let attemptNumber = 0;
+
+    
+    function initializeGame() {
+        player.column = 0;
+        player.row = 0;
+        player.score = 0;
+        drawGame();
+    }
+
+    function drawGame() {
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        const minRow = Math.max(0, player.row - 1);
+        const maxRow = Math.min(NUM_ROWS - 1, player.row + 1);
+        const minColumn = Math.max(0, player.column - 1);
+        const maxColumn = Math.min(NUM_COLUMNS - 1, player.column + 1);
+        
+        ctx.fillStyle = BACKGROUND_COLOR;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        for (let row = minRow; row <= maxRow; row++) {
+            for (let column = minColumn; column <= maxColumn; column++) {
+                ctx.beginPath();
+                ctx.rect(column * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                if (grid[row][column] === 1) {
+                    ctx.fillStyle = BLACK_COLOR;
+                } else if (grid[row][column] === 2) {
+                    ctx.fillStyle = YELLOW_COLOR;
+                } else {
+                    ctx.fillStyle = WHITE_COLOR;
+                }
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+        
+        ctx.beginPath();
+        ctx.arc(player.column * TILE_SIZE + TILE_SIZE / 2, player.row * TILE_SIZE + TILE_SIZE / 2, TILE_SIZE / 4, 0, Math.PI * 2);
+        ctx.fillStyle = BLUE_COLOR;
+        ctx.fill();
+        ctx.closePath();
+        
+        const pointsElement = document.getElementById("points");
+        pointsElement.textContent = "Points: " + player.score;
+
+        const scoresTable = document.getElementById("scores");
+        scoresTable.innerHTML = "<tr><th>Attempt</th><th>Score</th><th>Result</th></tr>";
+        for (let i = 0; i < scores.length; i++) {
+            scoresTable.innerHTML += "<tr><td>" + scores[i].attempt + "</td><td>" + scores[i].score + "</td><td>" + scores[i].result + "</td></tr>";
+        }
+    }
+
+
+    function movePlayer(direction) {
+        let newColumn = player.column;
+        let newRow = player.row;
+        
+        if (direction === "up" && player.row > 0) {
+            newRow--;
+        } else if (direction === "down" && player.row < NUM_ROWS - 1) {
+            newRow++;
+        } else if (direction === "left" && player.column > 0) {
+            newColumn--;
+        } else if (direction === "right" && player.column < NUM_COLUMNS - 1) {
+            newColumn++;
+        } else {
+            player.score += EXIT_PENALTY;
+            scores.push({ attempt: attemptNumber++, score: player.score, result: "Lost" });
+            initializeGame();
+            return;
+        }
+
+        player.column = newColumn;
+        player.row = newRow;
+        
+        if (grid[player.row][player.column] === 1) {
+            player.score += BLACK_PENALTY;
+        } else {    
+            player.score++;
+        }
+
+        if (grid[player.row][player.column] === 2) {
+            scores.push({ attempt: attemptNumber++, score: player.score, result: "Won" }); 
+            initializeGame();
+        }
+
+        drawGame();
+    }
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "ArrowUp") {
+            movePlayer("up");
+        } else if (event.key === "ArrowDown") {
+            movePlayer("down");
+        } else if (event.key === "ArrowLeft") {
+            movePlayer("left");
+        } else if (event.key === "ArrowRight") {
+            movePlayer("right");
+        }
+    });
+
+    window.onload = initializeGame;
+</script>
+</body>
+</html>
