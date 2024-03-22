@@ -1,0 +1,103 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f2f2f2;
+}
+
+#main {
+  width: 600px;
+  height: 600px;
+  background-color: #2F2F2F;
+}
+
+h1 {
+  text-align: center;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px;
+}
+
+.col {
+  flex: 1;
+  margin: 0 10px;
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+}
+
+button {
+  display: block;
+  margin: 10px auto;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.row .col:nth-child(2) {
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+#q-table {
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #fff;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#history {
+  max-height: 200px; /* Set a fixed height */
+  overflow: scroll; /* Enable vertical scrolling */
+  background-color: #ccc;
+}
+
+h4 {
+  margin-top: 0;
+}
+
+h5 {
+  margin-bottom: 5px;
+}
+
+/* Responsive */
+@media only screen and (max-width: 768px) {
+  .row {
+      flex-direction: column;
+  }
+
+  .col {
+      margin: 10px 0;
+  }
+
+  canvas {
+      width: 100%;
+  }
+}
